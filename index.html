@@ -6,6 +6,8 @@
   <title>OUSL GPA Calculator</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       --primary: #FF6B35;
@@ -45,7 +47,7 @@
     }
     .course {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto; /* Extra column for delete button */
+      grid-template-columns: 2fr 1fr 1fr auto;
       gap: 1rem;
       margin-bottom: 1rem;
       align-items: center;
@@ -72,7 +74,6 @@
       border-color: var(--secondary);
       box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2);
     }
-    /* Style for delete button inside a course */
     .deleteCourseButton {
       background: none;
       border: none;
@@ -269,7 +270,6 @@
           <i class="fas fa-trash-alt"></i>
         </button>
       `;
-      // Attach event listener to delete the course when the button is clicked
       const deleteBtn = course.querySelector('.deleteCourseButton');
       deleteBtn.addEventListener('click', () => {
         course.remove();
@@ -303,16 +303,16 @@
         const inputs = course.querySelectorAll('input, select');
         const courseName = inputs[0].value;
         const credits = parseFloat(inputs[1].value);
-        const grade = parseFloat(inputs[2].value);
-
-        if (!isNaN(credits) && !isNaN(grade)) {
+        const gradeValue = parseFloat(inputs[2].value);
+        const gradeText = inputs[2].options[inputs[2].selectedIndex].text;
+        
+        if (!isNaN(credits) && !isNaN(gradeValue)) {
           totalCredits += credits;
-          totalPoints += credits * grade;
+          totalPoints += credits * gradeValue;
           courseData.push({
             Course: courseName,
             Credits: credits,
-            Grade: inputs[2].options[inputs[2].selectedIndex].text,
-            'Grade Points': grade
+            Grade: gradeText
           });
         }
       });
@@ -329,6 +329,15 @@
 
       localStorage.setItem('courseData', JSON.stringify(courseData));
       saveCourses();
+
+      // Trigger confetti animation if GPA is more than 3.0
+      if (gpa > 3.0) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
     });
 
     function generateExcel() {
@@ -337,10 +346,10 @@
       const gpaClass = document.getElementById('gpaClass').textContent;
 
       const wsData = [
-        ['Course Name', 'Credits', 'Grade', 'Grade Points'],
-        ...courseData.map(c => [c.Course, c.Credits, c.Grade, c['Grade Points']]),
+        ['Course Name', 'Credits', 'Grade'],
+        ...courseData.map(c => [c.Course, c.Credits, c.Grade]),
         [],
-        ['Calculated GPA', gpa],
+        ['Final GPA Achieved', gpa],
         ['Academic Classification', gpaClass]
       ];
 
@@ -354,25 +363,14 @@
       const data = generateExcel();
       const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const fileName = `OUSL_GPA_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
-      const file = new File([blob], fileName, { type: blob.type });
-
-      // Check if the browser supports file sharing via the Web Share API
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        navigator.share({
-          title: 'My OUSL GPA Report',
-          files: [file]
-        }).catch(console.error);
-      } else {
-        // Fallback to download if share isn't supported
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     });
   </script>
 </body>

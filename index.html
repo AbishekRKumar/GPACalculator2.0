@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OUSL GPA Calculator</title>
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <!-- XLSX Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
-  <!-- Canvas Confetti Library -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       --primary: #FF6B35;
@@ -28,6 +28,7 @@
       line-height: 1.6;
       min-height: 100vh;
       padding: 2rem;
+      transition: background 0.3s, color 0.3s;
     }
     .container {
       max-width: 800px;
@@ -37,6 +38,7 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
       padding: 2rem;
       backdrop-filter: blur(10px);
+      transition: background 0.3s;
     }
     h1 {
       color: var(--primary);
@@ -44,6 +46,22 @@
       text-align: center;
       font-size: 2.5rem;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    /* Top Bar for Language & Dark Mode */
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .top-bar select,
+    .top-bar button {
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      border: 1px solid var(--primary);
+      background: var(--accent);
+      cursor: pointer;
     }
     .course {
       display: grid;
@@ -68,6 +86,7 @@
       font-size: 0.9rem;
       transition: all 0.3s ease;
       background: white;
+      color: var(--text);
     }
     input:focus, select:focus {
       outline: none;
@@ -100,6 +119,7 @@
       letter-spacing: 1px;
       font-size: 1rem;
       border-radius: 12px;
+      transition: transform 0.2s, opacity 0.2s;
     }
     button:hover {
       opacity: 0.9;
@@ -135,18 +155,9 @@
       text-align: center;
       border-top: 3px solid var(--primary);
     }
-    .disclaimer {
-      margin: 1.5rem 0;
-      padding: 1rem;
-      background: rgba(255, 0, 0, 0.05);
-      border: 1px solid #ffcccc;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      color: #666;
-    }
-    .developer-info p {
+    .developer-info p, .disclaimer p {
       margin: 0.5rem 0;
-      color: var(--text);
+      color: inherit;
       font-size: 0.9rem;
     }
     .developer-info a {
@@ -166,29 +177,59 @@
       border-radius: 25px;
       margin: 0.5rem 0;
     }
-    @media (max-width: 600px) {
-      .course {
-        grid-template-columns: 1fr;
-      }
-      .container {
-        padding: 1.5rem;
-        border-radius: 16px;
-      }
-      body {
-        padding: 1rem;
-      }
-      h1 {
-        font-size: 2rem;
-      }
-      .developer-info {
-        padding: 1rem;
-      }
+    /* Dark Mode Adjustments */
+    .dark-mode {
+      background: #2D3436;
+      color: #fff;
+    }
+    .dark-mode .container {
+      background: #3C3C3C;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+    .dark-mode h1,
+    .dark-mode p,
+    .dark-mode .course input,
+    .dark-mode .course select,
+    .dark-mode .top-bar select,
+    .dark-mode .top-bar button,
+    .dark-mode .badge {
+      color: #fff;
+    }
+    .dark-mode .course input,
+    .dark-mode .course select {
+      background: #555;
+      border-color: #777;
+    }
+    .dark-mode .top-bar select,
+    .dark-mode .top-bar button {
+      background: #555;
+      border-color: #777;
+    }
+    /* Override academic summary background in dark mode */
+    .dark-mode #result {
+      background: #555;
+      color: #fff;
+    }
+    /* Fix Developer Information visibility in dark mode */
+    .dark-mode .developer-info {
+      background: #444;  /* Darker background for better contrast */
+      color: #000000;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1><i class="fas fa-calculator"></i> OUSL GPA Calculator</h1>
+    <!-- Top Bar: Language Selector and Dark Mode Toggle -->
+    <div class="top-bar">
+      <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="ta">தமிழ்</option>
+        <option value="si">සිංහල</option>
+      </select>
+      <button id="darkModeToggle"><i class="fas fa-moon"></i> <span id="darkModeText">Dark Mode</span></button>
+    </div>
+
+    <h1 id="pageTitle"><i class="fas fa-calculator"></i> OUSL GPA Calculator</h1>
 
     <form id="gpaForm">
       <div id="coursesContainer">
@@ -196,23 +237,21 @@
       </div>
       <div class="actions">
         <button type="button" id="addCourseButton">
-          <i class="fas fa-plus-circle"></i> Add Course
+          <i class="fas fa-plus-circle"></i> <span data-translate="addCourse">Add Course</span>
         </button>
         <button type="submit" id="calculateButton" disabled>
-          <i class="fas fa-calculator"></i> Calculate GPA
+          <i class="fas fa-calculator"></i> <span data-translate="calculateGPA">Calculate GPA</span>
         </button>
       </div>
     </form>
 
     <div id="result">
-      <h2>Your Academic Summary</h2>
+      <h2 data-translate="academicSummary">Your Academic Summary</h2>
       <div class="gpa-display"><span id="gpaValue">0.00</span></div>
       <p id="gpaClass" class="gpa-class"></p>
-      <!-- New paragraph for a random nice message -->
-      <p id="niceMessage"></p>
       <div class="actions">
         <button id="shareButton">
-          <i class="fas fa-share-alt"></i> Share Results
+          <i class="fas fa-share-alt"></i> <span data-translate="shareResults">Share Results</span>
         </button>
       </div>
     </div>
@@ -220,38 +259,114 @@
     <div class="developer-info">
       <div class="badge">
         <i class="fas fa-user-graduate" style="color: var(--primary);"></i>
-        <span>Developer Information</span>
+        <span data-translate="devInfo">Developer Information</span>
       </div>
       <p>R. Abishek - BSc (Natural Sciences) - Undergraduate</p>
       <p>The Open University of Sri Lanka</p>
       <p>
-        <i class="fas fa-envelope"></i> Contact:
+        <i class="fas fa-envelope"></i> <span data-translate="contact">Contact:</span>
         <a href="mailto:abi.kumar6324@gmail.com">abi.kumar6324@gmail.com</a>
       </p>
       <p style="margin-top: 1rem; font-size: 0.8rem;">
-        <i class="fas fa-code"></i> Crafted with care for OUSL students
+        <i class="fas fa-code"></i> <span data-translate="crafted">Crafted with care for OUSL students</span>
       </p>
     </div>
 
     <div class="disclaimer">
-      <i class="fas fa-info-circle"></i> Note: This is an independent academic tool not affiliated with The Open University of Sri Lanka. Results should be verified with official university resources. For official GPA calculations, please consult your relevant faculty.
+      <p><i class="fas fa-info-circle"></i>
+      <strong>Note:</strong> When you click the <em>Share Results</em> button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the <em>Load Existing Data</em> option to upload this file—allowing you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.</p>
     </div>
 
-    <!-- Load Existing Data Button (placed at the bottom) -->
+    <!-- Load Existing Data Button -->
     <div class="actions" style="margin-top: 1rem;">
       <button type="button" id="uploadExcelButton">
-        <i class="fas fa-file-upload"></i> Load Existing Data
+        <i class="fas fa-file-upload"></i> <span data-translate="loadData">Load Existing Data</span>
       </button>
       <input type="file" id="uploadExcelInput" accept=".xlsx, .xls" style="display: none;">
     </div>
   </div>
 
   <script>
-    // Initialize with empty courses container
-    document.getElementById('coursesContainer').innerHTML = '';
+    // --------- Multi-language Support ---------
+    const translations = {
+      en: {
+        addCourse: "Add Course",
+        calculateGPA: "Calculate GPA",
+        academicSummary: "Your Academic Summary",
+        shareResults: "Share Results",
+        devInfo: "Developer Information",
+        contact: "Contact:",
+        crafted: "Crafted with care for OUSL students",
+        disclaimer: "Note: When you click the Share Results button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the Load Existing Data option to upload this file—allowing you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.",
+        loadData: "Load Existing Data",
+        darkMode: "Dark Mode",
+        lightMode: "Light Mode"
+      },
+      ta: {
+        addCourse: "பாடம் சேர்க்கவும்",
+        calculateGPA: "GPA கணக்கு",
+        academicSummary: "உங்கள் கல்வி சுருக்கம்",
+        shareResults: "முடிவுகளை பகிரவும்",
+        devInfo: "வளர்ச்சி தகவல்",
+        contact: "தொடர்பு:",
+        crafted: "OUSL மாணவர்களுக்காக அக்கறையுடன் உருவாக்கப்பட்டது",
+        disclaimer: "குறிப்பு: 'முடிவுகளை பகிரவும்' பொத்தானை அழுத்தும் போது, உங்கள் பாடப் தகவல்களும் கணிக்கப்பட்ட GPA-வும் கொண்ட Excel கோப்பு பதிவிறக்கம் செய்யப்படும். பின்னர், 'கூட இருப்புத் தரவை ஏற்று' என்பதன் மூலம் இந்த கோப்பை மீண்டும் ஏற்று, உங்கள் முந்தைய பதிவுகளை பெறலாம்; புதிய பாடங்களைச் சேர்த்து, இப்போது புதுப்பிக்கப்பட்ட GPA-ஐ மீண்டும் கணக்கிடலாம். இந்த கருவி OUSL-க்கு சார்ந்தது அல்ல. அதிகாரப்பூர்வ பல்கலைக்கழக தகவல்களுடன் முடிவுகளை சரிபார்க்கவும்.",
+        loadData: "கூட இருப்புத் தரவை ஏற்று",
+        darkMode: "இருண்ட முறை",
+        lightMode: "வெளிச்சம் முறை"
+      },
+      si: {
+        addCourse: "පාඨමාලා එකතු කරන්න",
+        calculateGPA: "GPA ගණනය කරන්න",
+        academicSummary: "ඔබගේ අධ්‍යයන සාරාංශය",
+        shareResults: "ප්‍රතිඵල බෙදාගන්න",
+        devInfo: "සංවර්ධක තොරතුරු",
+        contact: "සම්බන්ධ වන්න:",
+        crafted: "OUSL ශිෂ්‍යයින් සඳහා ආදරයෙන් නිර්මාණය කරන ලදි",
+        disclaimer: "සටහන්: 'ප්‍රතිඵල බෙදාගන්න' බොත්තම ඔබන විට, ඔබගේ පාඨමාලා විස්තර සහ ගණනය කරන ලද GPA අඩංගු Excel ගොනුවක් බාගත වේ. පසුව, 'දැනට පවතින දත්ත උඩුගත කරන්න' විකල්පය භාවිතා කර මෙම ගොනුව උඩුගත කර ඔබගේ පසුගිය තොරතුරු ප්‍රාප්ත කර, නව පාඨමාලා එක් කර, යාවත්කාලීන GPA ගණනය කළ හැකිය. මෙම මෙවලම OUSL-ට අයත් නොවන අතර, කරුණාකර නිල විශ්වවිද්‍යාල සම්පත් සමඟ ප්‍රතිඵල සනාථ කරන්න.",
+        loadData: "දැනට පවතින දත්ත උඩුගත කරන්න",
+        darkMode: "අඳුරු මාදිලිය",
+        lightMode: "පැහැදිලි මාදිලිය"
+      }
+    };
+
+    function updateLanguageTexts(lang) {
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        el.textContent = translations[lang][key];
+      });
+      // Update page title (if needed)
+      document.getElementById('pageTitle').innerHTML = `<i class="fas fa-calculator"></i> OUSL GPA Calculator`;
+      // Update dark mode button text based on current mode
+      const darkModeToggleText = document.getElementById('darkModeText');
+      if (document.body.classList.contains('dark-mode')) {
+        darkModeToggleText.textContent = translations[lang].lightMode;
+      } else {
+        darkModeToggleText.textContent = translations[lang].darkMode;
+      }
+      // Update disclaimer text
+      document.querySelector('.disclaimer p').textContent = translations[lang].disclaimer;
+    }
+
+    // Default language is English
+    let currentLang = 'en';
+    updateLanguageTexts(currentLang);
+    document.getElementById('languageSelect').addEventListener('change', (e) => {
+      currentLang = e.target.value;
+      updateLanguageTexts(currentLang);
+    });
+
+    // --------- Dark Mode Toggle ---------
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      updateLanguageTexts(currentLang);
+    });
+
+    // --------- Course Functions ---------
+    const coursesContainer = document.getElementById('coursesContainer');
+    coursesContainer.innerHTML = '';
 
     function saveCourses() {
-      const coursesContainer = document.getElementById('coursesContainer');
       localStorage.setItem('courses', coursesContainer.innerHTML);
       document.getElementById('calculateButton').disabled = coursesContainer.children.length === 0;
     }
@@ -296,12 +411,13 @@
 
     document.getElementById('addCourseButton').addEventListener('click', () => {
       const newCourse = createCourseElement();
-      document.getElementById('coursesContainer').appendChild(newCourse);
+      coursesContainer.appendChild(newCourse);
       addCourseEventListeners();
       saveCourses();
       document.getElementById('calculateButton').disabled = false;
     });
 
+    // --------- GPA Calculation ---------
     document.getElementById('gpaForm').addEventListener('submit', (e) => {
       e.preventDefault();
       const courses = document.getElementsByClassName('course');
@@ -330,38 +446,17 @@
       const gpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
       document.getElementById('gpaValue').textContent = gpa.toFixed(2);
       document.getElementById('result').style.display = 'block';
-
       const gpaClass = document.getElementById('gpaClass');
       if (gpa >= 3.7) gpaClass.textContent = 'First Class Honors';
       else if (gpa >= 3.3) gpaClass.textContent = 'Second Class Upper Division';
       else if (gpa >= 3.0) gpaClass.textContent = 'Second Class Lower Division';
       else gpaClass.textContent = 'General Pass';
-
-      // Set a random encouraging message
-      const compliments = [
-        "Great job! Keep up the excellent work!",
-        "Your dedication is inspiring. Study on!",
-        "Outstanding effort! Your hard work is paying off.",
-        "Bravo! Your commitment to learning is impressive.",
-        "Fantastic work! Keep striving for success.",
-        "You're doing amazing! Keep up the momentum."
-      ];
-      const randomMessage = compliments[Math.floor(Math.random() * compliments.length)];
-      document.getElementById('niceMessage').textContent = randomMessage;
-
+      
       localStorage.setItem('courseData', JSON.stringify(courseData));
       saveCourses();
-
-      // Trigger confetti animation if GPA is more than 3.0
-      if (gpa > 3.0) {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      }
     });
 
+    // --------- Generate Excel for Sharing ---------
     function generateExcel() {
       const courseData = JSON.parse(localStorage.getItem('courseData') || '[]');
       const gpa = document.getElementById('gpaValue').textContent;
@@ -395,7 +490,7 @@
       URL.revokeObjectURL(url);
     });
 
-    // --- Load Existing Data Feature ---
+    // --------- Load Existing Data Feature ---------
     document.getElementById('uploadExcelButton').addEventListener('click', () => {
       document.getElementById('uploadExcelInput').click();
     });
@@ -407,41 +502,21 @@
       reader.onload = function(e) {
         const data = e.target.result;
         const workbook = XLSX.read(data, { type: 'binary' });
-        const sheetName = workbook.SheetNames[0]; // use the first sheet
+        const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const sheetJson = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        // Expecting header row: ["Course Name", "Credits", "Grade"]
         const headers = sheetJson[0];
         if (!headers || headers[0] !== 'Course Name' || headers[1] !== 'Credits' || headers[2] !== 'Grade') {
           alert('Invalid Excel file format.');
           return;
         }
-        // Clear current courses
-        const coursesContainer = document.getElementById('coursesContainer');
         coursesContainer.innerHTML = '';
-        // Mapping from letter grade to numeric value
-        const letterToNumeric = {
-          "A+": 4,
-          "A": 4,
-          "A-": 3.7,
-          "B+": 3.3,
-          "B": 3,
-          "B-": 2.7,
-          "C+": 2.3,
-          "C": 2,
-          "C-": 1.7,
-          "D+": 1.3,
-          "D": 1,
-          "E": 0
-        };
-        // Loop through rows (starting at index 1)
         for (let i = 1; i < sheetJson.length; i++) {
           const row = sheetJson[i];
-          if (!row || row.length < 3 || !row[0]) break; // stop at empty row
+          if (!row || row.length < 3 || !row[0]) break;
           const courseName = row[0];
           const credits = parseFloat(row[1]);
           const gradeLetter = row[2];
-          // Create a new course element and set its values.
           const course = createCourseElement();
           const inputs = course.querySelectorAll('input, select');
           inputs[0].value = courseName;

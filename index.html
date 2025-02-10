@@ -13,7 +13,8 @@
       --primary: #FF6B35;
       --secondary: #FF9F1C;
       --background: #FFFFFF;
-      --text: #2D3436;
+      /* Updated darker text colour for light mode */
+      --text: #1a1a1a;
       --accent: #FFEBD6;
     }
     * {
@@ -213,7 +214,41 @@
     /* Fix Developer Information visibility in dark mode */
     .dark-mode .developer-info {
       background: #444;  /* Darker background for better contrast */
+      color: #000000;    /* Dark text in developer info */
+    }
+    /* Ensure developer info paragraphs get the dark text in dark mode */
+    .dark-mode .developer-info p {
       color: #000000;
+    }
+
+    /* ---------------- Mobile Friendly Adjustments ---------------- */
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+      .container {
+        padding: 1rem;
+      }
+      .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .top-bar select,
+      .top-bar button {
+        width: 100%;
+      }
+      .course {
+        grid-template-columns: 1fr;
+      }
+      .course input,
+      .course select,
+      .course button {
+        width: 100%;
+      }
+      .actions {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
     }
   </style>
 </head>

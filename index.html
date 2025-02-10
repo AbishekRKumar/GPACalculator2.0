@@ -8,12 +8,13 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <!-- XLSX Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
     :root {
       --primary: #FF6B35;
       --secondary: #FF9F1C;
       --background: #FFFFFF;
-      /* Updated darker text colour for light mode */
       --text: #1a1a1a;
       --accent: #FFEBD6;
     }
@@ -63,6 +64,10 @@
       border: 1px solid var(--primary);
       background: var(--accent);
       cursor: pointer;
+    }
+    /* In light mode, dark/light toggle gets a darker background */
+    body:not(.dark-mode) #darkModeToggle {
+      background: var(--secondary);
     }
     .course {
       display: grid;
@@ -141,6 +146,11 @@
       margin: 1rem 0;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     }
+    /* Motivational message style */
+    #motivationalMessage {
+      font-style: italic;
+      margin-top: 1rem;
+    }
     .actions {
       display: flex;
       gap: 1rem;
@@ -211,16 +221,11 @@
       background: #555;
       color: #fff;
     }
-    /* Fix Developer Information visibility in dark mode */
+    /* In dark mode, change Developer Information background to an even darker colour */
     .dark-mode .developer-info {
-      background: #444;  /* Darker background for better contrast */
-      color: #000000;    /* Dark text in developer info */
+      background: #111;
+      color: #fff;
     }
-    /* Ensure developer info paragraphs get the dark text in dark mode */
-    .dark-mode .developer-info p {
-      color: #000000;
-    }
-
     /* ---------------- Mobile Friendly Adjustments ---------------- */
     @media (max-width: 600px) {
       body {
@@ -228,14 +233,23 @@
       }
       .container {
         padding: 1rem;
+        margin-top: 60px; /* to prevent overlap with fixed top bar */
       }
       .top-bar {
-        flex-direction: column;
-        align-items: stretch;
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        flex-direction: row;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0.5rem;
+        z-index: 1000;
       }
       .top-bar select,
       .top-bar button {
-        width: 100%;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+        width: auto;
       }
       .course {
         grid-template-columns: 1fr;
@@ -284,6 +298,8 @@
       <h2 data-translate="academicSummary">Your Academic Summary</h2>
       <div class="gpa-display"><span id="gpaValue">0.00</span></div>
       <p id="gpaClass" class="gpa-class"></p>
+      <!-- Motivational message -->
+      <p id="motivationalMessage"></p>
       <div class="actions">
         <button id="shareButton">
           <i class="fas fa-share-alt"></i> <span data-translate="shareResults">Share Results</span>
@@ -481,11 +497,38 @@
       const gpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
       document.getElementById('gpaValue').textContent = gpa.toFixed(2);
       document.getElementById('result').style.display = 'block';
+      
       const gpaClass = document.getElementById('gpaClass');
       if (gpa >= 3.7) gpaClass.textContent = 'First Class Honors';
       else if (gpa >= 3.3) gpaClass.textContent = 'Second Class Upper Division';
       else if (gpa >= 3.0) gpaClass.textContent = 'Second Class Lower Division';
       else gpaClass.textContent = 'General Pass';
+      
+      // Trigger confetti if GPA is greater than 3.0
+      if (gpa > 3.0) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+
+      // Set a motivational message
+      const highGpaMessages = [
+        "Great job! Your hard work is paying off!",
+        "Amazing performance! Keep shining!",
+        "Fantastic work! Your dedication shows!",
+        "Excellent! You're on the right track!"
+      ];
+      const lowGpaMessages = [
+        "Don't worry, every challenge is a stepping stone!",
+        "Keep pushing, your best is yet to come!",
+        "Stay motivated, you can achieve more!",
+        "Every setback is a setup for a comeback!"
+      ];
+      const msgArray = gpa < 3.0 ? lowGpaMessages : highGpaMessages;
+      const randomMsg = msgArray[Math.floor(Math.random() * msgArray.length)];
+      document.getElementById('motivationalMessage').textContent = randomMsg;
       
       localStorage.setItem('courseData', JSON.stringify(courseData));
       saveCourses();

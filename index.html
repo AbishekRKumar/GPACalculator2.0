@@ -57,13 +57,20 @@
             background: var(--accent);
             padding: 1rem;
             border-radius: 12px;
+            animation: slideIn 0.3s ease;
         }
 
-        input, select, button {
-            padding: 1rem;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .course input,
+        .course select {
+            padding: 0.8rem;
             border: 2px solid var(--primary);
             border-radius: 12px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
             background: white;
         }
@@ -75,6 +82,7 @@
         }
 
         button {
+            padding: 1rem;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
@@ -86,6 +94,8 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-size: 1rem;
+            border-radius: 12px;
         }
 
         button:hover {
@@ -193,13 +203,13 @@
 
         <form id="gpaForm">
             <div id="coursesContainer">
-                <!-- Courses will be added here -->
+                <!-- Courses will be added dynamically -->
             </div>
             <div class="actions">
                 <button type="button" id="addCourseButton">
                     <i class="fas fa-plus-circle"></i> Add Course
                 </button>
-                <button type="submit">
+                <button type="submit" id="calculateButton" disabled>
                     <i class="fas fa-calculator"></i> Calculate GPA
                 </button>
             </div>
@@ -238,18 +248,13 @@
     </div>
 
     <script>
-        // Initialize courses from localStorage
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedCourses = localStorage.getItem('courses');
-            if (savedCourses) {
-                document.getElementById('coursesContainer').innerHTML = savedCourses;
-                addCourseEventListeners();
-            }
-        });
+        // Initialize with empty courses container
+        document.getElementById('coursesContainer').innerHTML = '';
 
         function saveCourses() {
             const coursesContainer = document.getElementById('coursesContainer');
             localStorage.setItem('courses', coursesContainer.innerHTML);
+            document.getElementById('calculateButton').disabled = coursesContainer.children.length === 0;
         }
 
         function createCourseElement() {
@@ -282,15 +287,14 @@
             });
         }
 
-        // Add Course Button Handler
         document.getElementById('addCourseButton').addEventListener('click', () => {
             const newCourse = createCourseElement();
             document.getElementById('coursesContainer').appendChild(newCourse);
             addCourseEventListeners();
             saveCourses();
+            document.getElementById('calculateButton').disabled = false;
         });
 
-        // GPA Calculation Handler
         document.getElementById('gpaForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const courses = document.getElementsByClassName('course');
@@ -330,7 +334,6 @@
             saveCourses();
         });
 
-        // Excel Generation
         function generateExcel() {
             const courseData = JSON.parse(localStorage.getItem('courseData') || '[]');
             const gpa = document.getElementById('gpaValue').textContent;
@@ -350,7 +353,6 @@
             return XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         }
 
-        // Share Button Handler
         document.getElementById('shareButton').addEventListener('click', () => {
             const data = generateExcel();
             const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

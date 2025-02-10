@@ -180,13 +180,15 @@
       text-decoration: underline;
     }
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--accent);
-      padding: 0.5rem 1rem;
-      border-radius: 25px;
-      margin: 0.5rem 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);  /* Darker shade */
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  margin: 0.5rem 0;
+}
+
     }
     /* Dark Mode Adjustments */
     .dark-mode {
@@ -233,8 +235,7 @@
       }
       .container {
         padding: 1rem;
-        /* Increase top margin to ensure the fixed top bar does not overlap the title */
-        margin-top: 150px;
+        margin-top: 60px; /* to prevent overlap with fixed top bar */
       }
       .top-bar {
         position: fixed;
@@ -268,19 +269,17 @@
   </style>
 </head>
 <body>
-  <!-- Fixed Top Bar (remains outside the container) -->
-  <div class="top-bar">
-    <select id="languageSelect">
-      <option value="en">English</option>
-      <option value="ta">தமிழ்</option>
-      <option value="si">සිංහල</option>
-    </select>
-    <button id="darkModeToggle">
-      <i class="fas fa-moon"></i> <span id="darkModeText">Dark Mode</span>
-    </button>
-  </div>
-
   <div class="container">
+    <!-- Top Bar: Language Selector and Dark Mode Toggle -->
+    <div class="top-bar">
+      <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="ta">தமிழ்</option>
+        <option value="si">සිංහල</option>
+      </select>
+      <button id="darkModeToggle"><i class="fas fa-moon"></i> <span id="darkModeText">Dark Mode</span></button>
+    </div>
+
     <h1 id="pageTitle"><i class="fas fa-calculator"></i> OUSL GPA Calculator</h1>
 
     <form id="gpaForm">
@@ -312,7 +311,8 @@
 
     <div class="developer-info">
       <div class="badge">
-        <i class="fas fa-user-graduate" style="color: var(--primary);"></i>
+        <i class="fas fa-user-graduate" style="color: #000;"></i>
+
         <span data-translate="devInfo">Developer Information</span>
       </div>
       <p>R. Abishek - BSc (Natural Sciences) - Undergraduate</p>
@@ -327,10 +327,8 @@
     </div>
 
     <div class="disclaimer">
-      <p>
-        <i class="fas fa-info-circle"></i>
-        <strong>Note:</strong> When you click the <em>Share Results</em> button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the <em>Load Existing Data</em> option to upload this file—allowing you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.
-      </p>
+      <p><i class="fas fa-info-circle"></i>
+      <strong>Note:</strong> When you click the <em>Share Results</em> button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the <em>Load Existing Data</em> option to upload this file—allowing you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.</p>
     </div>
 
     <!-- Load Existing Data Button -->

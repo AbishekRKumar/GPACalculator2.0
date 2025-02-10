@@ -59,12 +59,11 @@
             border-radius: 12px;
         }
 
-        .course input,
-        .course select {
-            padding: 0.8rem;
+        input, select, button {
+            padding: 1rem;
             border: 2px solid var(--primary);
             border-radius: 12px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             transition: all 0.3s ease;
             background: white;
         }
@@ -76,7 +75,6 @@
         }
 
         button {
-            padding: 1rem;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
@@ -88,8 +86,6 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-size: 1rem;
-            border-radius: 12px;
         }
 
         button:hover {
@@ -242,6 +238,7 @@
     </div>
 
     <script>
+        // Initialize courses from localStorage
         document.addEventListener('DOMContentLoaded', () => {
             const savedCourses = localStorage.getItem('courses');
             if (savedCourses) {
@@ -285,6 +282,7 @@
             });
         }
 
+        // Add Course Button Handler
         document.getElementById('addCourseButton').addEventListener('click', () => {
             const newCourse = createCourseElement();
             document.getElementById('coursesContainer').appendChild(newCourse);
@@ -292,6 +290,7 @@
             saveCourses();
         });
 
+        // GPA Calculation Handler
         document.getElementById('gpaForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const courses = document.getElementsByClassName('course');
@@ -331,6 +330,7 @@
             saveCourses();
         });
 
+        // Excel Generation
         function generateExcel() {
             const courseData = JSON.parse(localStorage.getItem('courseData') || '[]');
             const gpa = document.getElementById('gpaValue').textContent;
@@ -350,6 +350,7 @@
             return XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
         }
 
+        // Share Button Handler
         document.getElementById('shareButton').addEventListener('click', () => {
             const data = generateExcel();
             const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

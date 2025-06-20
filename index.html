@@ -21,11 +21,11 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
     :root {
-      --primary: #FF6B35;
-      --secondary: #FF9F1C;
+      --primary: #4361EE;
+      --secondary: #3A0CA3;
       --background: #FFFFFF;
       --text: #1a1a1a;
-      --accent: #FFEBD6;
+      --accent: #E6E6FA;
     }
     * {
       box-sizing: border-box;
@@ -34,7 +34,7 @@
     }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      background: linear-gradient(135deg, #4361EE 0%, #3A0CA3 100%);
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
@@ -199,12 +199,12 @@
     }
     /* Dark Mode Adjustments */
     .dark-mode {
-      background: #2D3436;
-      color: #fff;
+      background: #121212;
+      color: #f5f5f5;
     }
     .dark-mode .container {
-      background: #3C3C3C;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      background: #1E1E1E;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
     }
     .dark-mode h1,
     .dark-mode p,
@@ -213,28 +213,55 @@
     .dark-mode .top-bar select,
     .dark-mode .top-bar button,
     .dark-mode .badge {
-      color: #fff;
+      color: #f5f5f5;
     }
     .dark-mode .course input,
     .dark-mode .course select {
-      background: #555;
-      border-color: #777;
+      background: #2D2D2D;
+      border-color: #444;
     }
     .dark-mode .top-bar select,
     .dark-mode .top-bar button {
-      background: #555;
-      border-color: #777;
+      background: #2D2D2D;
+      border-color: #444;
     }
     /* Override academic summary background in dark mode */
     .dark-mode #result {
-      background: #555;
-      color: #fff;
+      background: #2D2D2D;
+      color: #f5f5f5;
     }
     /* In dark mode, change Developer Information background to an even darker colour */
     .dark-mode .developer-info {
-      background: #111;
-      color: #fff;
+      background: #0A0A0A;
+      color: #f5f5f5;
+      border-top: 3px solid #4361EE;
     }
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 1000;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .fab:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    .fab i {
+      font-size: 1.5rem;
+    }
+
     /* ---------------- Mobile Friendly Adjustments ---------------- */
     @media (max-width: 600px) {
       body {
@@ -321,10 +348,11 @@
 
     <div class="developer-info">
       <div class="badge">
-        <i class="fas fa-user-graduate" style="color: var(--primary);"></i>
+        <i class="fas fa-user-graduate" style="color: var #0000FF;"></i>
         <span data-translate="devInfo">Developer Information</span>
       </div>
-      <p>R. Abishek - BSc (Natural Sciences) - Undergraduate</p>
+      
+      <p><div class="badge-base LI-profile-badge" data-locale="en_US" data-size="medium" data-theme="light" data-type="VERTICAL" data-vanity="abishek-rathnakumar-lk" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://lk.linkedin.com/in/abishek-rathnakumar-lk?trk=profile-badge">Abishek Rathnakumar</a></div>   BSc (Natural Sciences) - Undergraduate</p>
       <p>The Open University of Sri Lanka</p>
       <p>
         <i class="fas fa-envelope"></i> <span data-translate="contact">Contact:</span>
@@ -338,7 +366,7 @@
     <div class="disclaimer">
       <p>
         <i class="fas fa-info-circle"></i>
-        <strong>Note:</strong> When you click the <em>Share Results</em> button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the <em>Load Existing Data</em> option to upload this file—allowing you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.
+        <strong>Note:</strong> When you click the <em>Share Results</em> button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the <em>Load Existing Data</em> option to upload this file which allows you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.
       </p>
     </div>
 
@@ -362,7 +390,7 @@
         devInfo: "Developer Information",
         contact: "Contact:",
         crafted: "Crafted with care for OUSL students",
-        disclaimer: "Note: When you click the Share Results button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the Load Existing Data option to upload this file—allowing you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.",
+        disclaimer: "Note: When you click the Share Results button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the Load Existing Data option to upload this file allows you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.",
         loadData: "Load Existing Data",
         darkMode: "Dark Mode",
         lightMode: "Light Mode"
@@ -628,5 +656,8 @@
       reader.readAsBinaryString(file);
     });
   </script>
+  <a href="https://abishekrkumar.github.io/OUSL-FE-Target-Calc/" class="fab" title="FE Target Calculator">
+    <i class="fas fa-bullseye"></i>
+  </a>
 </body>
 </html>

@@ -304,6 +304,274 @@
   </style>
 </head>
 <body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5HL4F5ZJGK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5HL4F5ZJGK');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUSL GPA Calculator</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <!-- XLSX Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    /* ... existing CSS styles ... */
+  </style>
+</head>
+<body>
+  <!-- Updated datalist with all courses -->
+  <datalist id="courseList">
+    <!-- Level 3 Courses -->
+    <option value="BYU3301" data-credits="3">Organization of Cells and Plant Biochemistry</option>
+    <option value="BYU3500" data-credits="5">Diversity of Plants</option>
+    <option value="CYU3300" data-credits="3">Basic Principles of Chemistry I</option>
+    <option value="CYU3201" data-credits="2">Basic Principles of Chemistry II</option>
+    <option value="CYU3302" data-credits="3">Basic Practical Chemistry</option>
+    <option value="PHU3300" data-credits="3">General and Thermal Physics</option>
+    <option value="PHU3301" data-credits="3">Basic Electromagnetism</option>
+    <option value="PHU3202" data-credits="2">Waves in Physics</option>
+    <option value="ZYU3500" data-credits="5">Animal Life and Diversity</option>
+    <option value="ZYU3301" data-credits="3">Biogeography</option>
+    <option value="CSU3200" data-credits="2">Introduction to Computer Programming</option>
+    <option value="CSU3301" data-credits="3">Database Design and Implementation</option>
+    <option value="CSU3302" data-credits="3">Data Structures & Algorithms</option>
+    <option value="ADU3300" data-credits="3">Vector Algebra</option>
+    <option value="ADU3201" data-credits="2">Basic Statistics</option>
+    <option value="ADU3302" data-credits="3">Differential Equations</option>
+    <option value="PEU3300" data-credits="3">Mathematical Logic and Mathematical Proofs</option>
+    <option value="PEU3301" data-credits="3">Foundations of Mathematics</option>
+    <option value="PEU3202" data-credits="2">Vector Spaces</option>
+    
+    <!-- Open Elective Courses Level 3 -->
+    <option value="ADU3218" data-credits="2">Basic Statistics</option>
+    <option value="DSU3298" data-credits="2">Introduction to Sri Lankan Society</option>
+    <option value="FNU3200" data-credits="2">Ethics in Science & Technology</option>
+    <option value="FNU3201" data-credits="2">Communication Skills</option>
+    <option value="LLU3261" data-credits="2">Understanding Law</option>
+    <option value="OSU3208" data-credits="2">Managing Your Work and People</option>
+    
+    <!-- Continuing Education Courses -->
+    <option value="ADE3200" data-credits="2">Applied Calculus I</option>
+    <option value="CSE3214" data-credits="2">Information & Communication Technology Skills</option>
+    <option value="CYE3200" data-credits="2">Mathematics for Chemistry and Biology</option>
+    <option value="FDE3021" data-credits="0">Empowering for Independent Learning (EfIL)</option>
+    <option value="LTE3407" data-credits="4">English for General Academic Purposes (EGAP)</option>
+    
+    <!-- Level 4 Courses -->
+    <option value="BYU4300" data-credits="3">Plant Physiology</option>
+    <option value="BYU4301" data-credits="3">Genetics and Evolution</option>
+    <option value="BYU4302" data-credits="3">Systematics of Higher Plants and Animals</option>
+    <option value="BYU4303" data-credits="3">Principles of Microbiology</option>
+    <option value="CYU4300" data-credits="3">Inorganic Chemistry</option>
+    <option value="CYU4301" data-credits="3">Concepts in Chemistry</option>
+    <option value="CYU4302" data-credits="3">Practical Chemistry II</option>
+    <option value="CYU4303" data-credits="3">Organic Chemistry I</option>
+    <option value="PHU4300" data-credits="3">Modern Physics</option>
+    <option value="PHU4301" data-credits="3">Electronics</option>
+    <option value="PHU4302" data-credits="3">Optics</option>
+    <option value="PHU4303" data-credits="3">Mathematical Methods for Physics</option>
+    <option value="ZYU4300" data-credits="3">Animal Form and Function</option>
+    <option value="ZYU4301" data-credits="3">Ecology</option>
+    <option value="ZYU4302" data-credits="3">Animal Development</option>
+    <option value="ZYU4303" data-credits="3">Animal Behaviour</option>
+    <option value="CSU4300" data-credits="3">Operating Systems</option>
+    <option value="CSU4301" data-credits="3">Object Oriented Programming</option>
+    <option value="CSU4302" data-credits="3">System Analysis & Software Engineering</option>
+    <option value="CSU4303" data-credits="3">Computer Networks</option>
+    <option value="ADU4300" data-credits="3">Statistical Distribution Theory</option>
+    <option value="ADU4301" data-credits="3">Newtonian Mechanics I</option>
+    <option value="ADU4302" data-credits="3">Vector Calculus</option>
+    <option value="ADU4303" data-credits="3">Applied Linear Algebra and Differential Equations</option>
+    <option value="PEU4300" data-credits="3">Real Analysis I</option>
+    <option value="PEU4301" data-credits="3">Real Analysis II</option>
+    <option value="PEU4302" data-credits="3">Linear Algebra</option>
+    <option value="PEU4303" data-credits="3">Group Theory I</option>
+    
+    <!-- Level 5 Courses -->
+    <option value="BYU5300" data-credits="3">Environmental and Applied Microbiology</option>
+    <option value="BYU5301" data-credits="3">Plant Pathology</option>
+    <option value="BYU5302" data-credits="3">Plant Growth and Development</option>
+    <option value="BYU5303" data-credits="3">Plants and Man</option>
+    <option value="BYU5304" data-credits="3">Soils and Plant Growth</option>
+    <option value="BYU5305" data-credits="3">Literature Review in Botany (Limited Registration)</option>
+    <option value="BYU5306" data-credits="3">Plant Breeding</option>
+    <option value="BYU5307" data-credits="3">Forest Management& its Conservation</option>
+    <option value="BYU5308" data-credits="3">Postharvest Technology of Fresh Produce</option>
+    <option value="BYU5610" data-credits="6">Research Project in Botany (Limited Registration)</option>
+    <option value="CYU5300" data-credits="3">Organometallic Chemistry</option>
+    <option value="CYU5301" data-credits="3">Concepts in Spectroscopy</option>
+    <option value="CYU5302" data-credits="3">Analytical Chemistry</option>
+    <option value="CYU5303" data-credits="3">Organic Chemistry II</option>
+    <option value="CYU5304" data-credits="3">Chemistry of Biomolecules</option>
+    <option value="CYU5305" data-credits="3">Natural Product Chemistry</option>
+    <option value="CYU5306" data-credits="3">Biochemistry</option>
+    <option value="CYU5307" data-credits="3">Chemical aspects of Food Industry</option>
+    <option value="CYU5308" data-credits="3">Instrumental Methods of Chemical Analysis</option>
+    <option value="CYU5310" data-credits="3">Literature Project in Chemistry</option>
+    <option value="CYU5611" data-credits="6">Research Project in Chemistry</option>
+    <option value="CYU5312" data-credits="3">Industrial Chemistry I</option>
+    <option value="CYU5614" data-credits="6">Physical Chemistry I</option>
+    <option value="CYU5615" data-credits="6">Advanced Organic Chemistry</option>
+    <option value="PHU5300" data-credits="3">Nuclear and Particle Physics</option>
+    <option value="PHU5301" data-credits="3">Practical Physics</option>
+    <option value="PHU5302" data-credits="3">Atmospheric Physics</option>
+    <option value="PHU5303" data-credits="3">Data Acquisition and Signal Processing</option>
+    <option value="PHU5304" data-credits="3">Biophysics</option>
+    <option value="PHU5305" data-credits="3">Essentials of Geology</option>
+    <option value="PHU5306" data-credits="3">Applied Geology</option>
+    <option value="PHU5307" data-credits="3">Medical Physics</option>
+    <option value="PHU5308" data-credits="3">Fundamentals of Geophysics</option>
+    <option value="PHU5309" data-credits="3">Literature Survey Project in Physics</option>
+    <option value="PHU5610" data-credits="6">Research Project in Physics</option>
+    <option value="PHU5311" data-credits="3">Astronomy</option>
+    <option value="PHU5312" data-credits="3">Solid State Physics</option>
+    <option value="PHU5313OP" data-credits="3">Advanced Electromagnetism</option>
+    <option value="PHU5314OP" data-credits="3">Thermodynamics</option>
+    <option value="PHU5315OP" data-credits="3">Renewable Energy Sources</option>
+    <option value="PHU5318" data-credits="3">Electronics for Biology Students</option>
+    <option value="ZYU5300" data-credits="3">Aquatic Biology</option>
+    <option value="ZYU5301" data-credits="3">Fish Biology and Fishery Management</option>
+    <option value="ZYU5302" data-credits="3">Conservation & Management of Biodiversity</option>
+    <option value="ZYU5303" data-credits="3">Environmental Toxicology</option>
+    <option value="ZYU5304" data-credits="3">Parasitology</option>
+    <option value="ZYU5305" data-credits="3">Human Biology</option>
+    <option value="ZYU5306" data-credits="3">Entomology</option>
+    <option value="ZYU5307" data-credits="3">Mammalian Biology</option>
+    <option value="ZYU5608" data-credits="6">Zoology Project</option>
+    <option value="ZYU5309" data-credits="3">Palaeobiology</option>
+    <option value="ZYU5310" data-credits="3">Concepts and Application of Evolution Biology</option>
+    <option value="ZYU5311" data-credits="3">Literature Review in Zoology</option>
+    <option value="ZYU5312" data-credits="3">Zoology Essay</option>
+    <option value="ZYU5313" data-credits="3">Research Methodology</option>
+    <option value="ZYU5314" data-credits="3">Fundamentals of Ornithology</option>
+    <option value="ZYU5315" data-credits="3">Fundamentals of Molecular Biology</option>
+    <option value="CSU5300" data-credits="3">IT Project Management</option>
+    <option value="CSU5301" data-credits="3">Software Quality Assurance</option>
+    <option value="CSU5302" data-credits="3">Web Technologies</option>
+    <option value="CSU5303" data-credits="3">Management Information Systems</option>
+    <option value="CSU5304" data-credits="3">Mathematics for Computing</option>
+    <option value="CSU5305" data-credits="3">Theory of Computing</option>
+    <option value="CSU5306" data-credits="3">Digital Electronics</option>
+    <option value="CSU5312" data-credits="3">Wireless and Cellular Networks</option>
+    <option value="CSU5308" data-credits="3">Artificial Intelligence</option>
+    <option value="CSU5317" data-credits="3">Artificial Intelligence</option>
+    <option value="CSU5309" data-credits="3">Information Security & Cryptography</option>
+    <option value="CSU5310" data-credits="3">Computer Architecture</option>
+    <option value="CSU5311" data-credits="3">Computer Graphics</option>
+    <option value="CSU5320" data-credits="3">Project in Computer Science</option>
+    <option value="ADU5300" data-credits="3">Linear Programming</option>
+    <option value="ADU5301" data-credits="3">Regression Analysis I</option>
+    <option value="ADU5302" data-credits="3">Mathematical Methods</option>
+    <option value="ADU5303" data-credits="3">Newtonian Mechanics II</option>
+    <option value="ADU5304" data-credits="3">Operational Research</option>
+    <option value="ADU5305" data-credits="3">Statistical Inference</option>
+    <option value="ADU5306" data-credits="3">Fluid Mechanics</option>
+    <option value="ADU5307" data-credits="3">Numerical Methods</option>
+    <option value="ADU5308" data-credits="3">Graph Theory</option>
+    <option value="ADU5309" data-credits="3">Design and Analysis of Experiments</option>
+    <option value="ADU5310" data-credits="3">Time Series Analysis</option>
+    <option value="ADU5312" data-credits="3">Data Mining Techniques</option>
+    <option value="ADU5313" data-credits="3">Generalized Linear Models</option>
+    <option value="ADU5314" data-credits="3">Sampling Techniques</option>
+    <option value="ADU5615" data-credits="6">Project in Mathematics</option>
+    <option value="PEU5300" data-credits="3">Riemann Integration</option>
+    <option value="PEU5301" data-credits="3">Ring Theory</option>
+    <option value="PEU5302" data-credits="3">Combinatorics</option>
+    <option value="PEU5303" data-credits="3">Number Theory</option>
+    <option value="PEU5304" data-credits="3">Introduction to Complex Analysis</option>
+    <option value="PEU5305" data-credits="3">Complex Analysis I</option>
+    <option value="PEU5306" data-credits="3">Introduction to dynamical systems</option>
+    <option value="PEU5307" data-credits="3">Cryptography</option>
+    
+    <!-- Open Elective Courses Level 5 -->
+    <option value="ADU5318" data-credits="3">Bio Statistics</option>
+    <option value="ADU5319" data-credits="3">Design and Analysis of Experiments</option>
+    <option value="ADU5320" data-credits="3">Introduction to MATLAB Software</option>
+    <option value="BYU5318" data-credits="3">Environmental Studies</option>
+    <option value="FNU5300" data-credits="3">GIS and Remote Sensing in Natural Resource Management</option>
+    <option value="FNU5301" data-credits="3">Environmental Degradation Management</option>
+    <option value="FNU5302" data-credits="3">Fundamentals of Environmental Impact Assessment</option>
+    <option value="ADU5321" data-credits="3">Applied Calculus II</option>
+    
+    <!-- Level 6 Courses -->
+    <option value="BYU6300" data-credits="3">Plant Molecular Biology</option>
+    <option value="BYU6301" data-credits="3">Bioinformatics</option>
+    <option value="BYU6302" data-credits="3">Biotechnology</option>
+    <option value="BYU6303" data-credits="3">Experimental Design and Biological data Analysis</option>
+    <option value="BYU6304" data-credits="3">Integrated Crop Protection</option>
+    <option value="BYU6305" data-credits="3">Industrial Microbiology</option>
+    <option value="BYU6306" data-credits="3">Molecular Systematics</option>
+    <option value="BYU6307" data-credits="3">Advanced Plant Physiology and Biochemistry</option>
+    <option value="BYU6308" data-credits="3">Advanced Ecology</option>
+    <option value="BYU6309" data-credits="3">Soil Biology</option>
+    <option value="BYU6310" data-credits="3">Advanced Plant Pathology</option>
+    <option value="BYU6911" data-credits="9">Research Project in Botany (Special Degree)</option>
+    <option value="BYU6313" data-credits="3">Special Topics in Botany</option>
+    <option value="CYU6600" data-credits="6">Advanced Concepts in Chemistry</option>
+    <option value="CYU6301" data-credits="3">Selected topics in Inorganic Chemistry</option>
+    <option value="CYU6304" data-credits="3">Inorganic Spectroscopy & Structural Chemistry</option>
+    <option value="CYU6305" data-credits="3">Concepts in Industrial Chemistry</option>
+    <option value="CYU6606" data-credits="6">Advanced Experimental Chemistry</option>
+    <option value="CYU6307" data-credits="3">Industrial Training and Literature Seminar</option>
+    <option value="CYU6608" data-credits="9">Research Project in Chemistry</option>
+    <option value="PHU6300" data-credits="3">Advanced Practical in Physics</option>
+    <option value="PHU6301" data-credits="3">Advanced Solid-State Physics</option>
+    <option value="PHU6302" data-credits="3">Advanced Quantum Mechanics</option>
+    <option value="PHU6603" data-credits="6">Advanced Research Project in Physics</option>
+    <option value="PHU6304" data-credits="3">Advanced Electronics</option>
+    <option value="PHU6305" data-credits="3">Nanophysics and its Applications</option>
+    <option value="PHU6306" data-credits="3">Statistical Physics</option>
+    <option value="PHU6307" data-credits="3">Modern Optics</option>
+    <option value="PHU6308" data-credits="3">Classical Mechanics</option>
+    <option value="ZYU6300" data-credits="3">Management of Insect Pests and Vectors</option>
+    <option value="ZYU6301" data-credits="3">Aquaculture</option>
+    <option value="ZYU6302" data-credits="3">Immunology</option>
+    <option value="ZYU6605" data-credits="6">Advanced Laboratory Techniques in Zoology</option>
+    <option value="ZYU6306" data-credits="3">Advanced Ornithology</option>
+    <option value="ZYU6908" data-credits="9">Research Project in Zoology</option>
+    <option value="ZYU6309" data-credits="3">Oceanography and Ocean Resources</option>
+    <option value="ZYU6310" data-credits="3">Wildlife Management and Conservation</option>
+    <option value="ZYU6311" data-credits="3">Special Topics in Zoology</option>
+    <option value="ZYU6312" data-credits="3">Wildlife DNA forensics</option>
+    <option value="ZYU6313" data-credits="3">Advanced Techniques in Molecular Biology</option>
+    <option value="ADU6300" data-credits="3">Stochastic Processes</option>
+    <option value="ADU6301" data-credits="3">Regression Analysis II</option>
+    <option value="ADU6302" data-credits="3">Statistical Quality Control</option>
+    <option value="ADU6303" data-credits="3">Actuarial Mathematics</option>
+    <option value="ADU6304" data-credits="3">Computational Mathematics</option>
+    <option value="ADU6305" data-credits="3">Optimization Theory</option>
+    <option value="ADU6306" data-credits="3">Mathematical Modelling</option>
+    <option value="PEU6300" data-credits="3">Group Theory II</option>
+    <option value="PEU6601" data-credits="6">Point Set Topology</option>
+    <option value="PEU6602" data-credits="6">Measure Theory</option>
+    <option value="PEU6303" data-credits="3">Complex Analysis II</option>
+    <option value="PEU6304" data-credits="3">Functional Analysis</option>
+    <option value="PEU6305" data-credits="3">Introduction to Galois Theory</option>
+    <option value="PEU6306" data-credits="3">Advanced Topics in Real Analysis</option>
+    <option value="PEU6611" data-credits="6">Research project in Mathematics</option>
+  </datalist>
+
+  <!-- ... rest of the HTML remains unchanged ... -->
+
+  <script>
+    // ... existing JavaScript code remains unchanged ...
+  </script>
+  <a href="https://abishekrkumar.github.io/OUSL-FE-Target-Calc/" class="fab" title="FE Target Calculator">
+    <i class="fas fa-bullseye"></i>
+  </a>
+</body>
+</html>
   <!-- Fixed Top Bar (remains outside the container) -->
   <div class="top-bar">
     <select id="languageSelect">
@@ -468,7 +736,7 @@
       const course = document.createElement('div');
       course.className = 'course';
       course.innerHTML = `
-        <input type="text" placeholder="Course Name" required>
+        <input type="text" placeholder="Course Name" required list="courseList">
         <input type="number" placeholder="Credits" min="1" step="0.5" required>
         <select required>
           <option value="4">A+</option>
@@ -499,6 +767,22 @@
     function addCourseEventListeners() {
       document.querySelectorAll('.course input, .course select').forEach(element => {
         element.addEventListener('change', saveCourses);
+      });
+
+      // Add autocomplete functionality for course names
+      document.querySelectorAll('.course input[list="courseList"]').forEach(input => {
+        input.addEventListener('input', function() {
+          const courseList = document.getElementById('courseList');
+          const options = courseList.options;
+          const creditsInput = this.closest('.course').querySelector('input[type="number"]');
+          
+          for (let i = 0; i < options.length; i++) {
+            if (options[i].value === this.value) {
+              creditsInput.value = options[i].dataset.credits;
+              break;
+            }
+          }
+        });
       });
     }
 

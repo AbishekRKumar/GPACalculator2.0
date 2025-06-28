@@ -261,6 +261,62 @@
     .fab i {
       font-size: 1.5rem;
     }
+    
+    /* Upload Section Styles */
+    .upload-section {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .dark-mode .upload-section {
+      background: rgba(30, 30, 30, 0.3);
+    }
+    .upload-area {
+      border: 2px dashed var(--primary);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 1rem 0;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .upload-area:hover {
+      background: rgba(67, 97, 238, 0.1);
+    }
+    .upload-area i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    #fileInput {
+      display: none;
+    }
+    #parseResults {
+      margin-top: 1rem;
+      text-align: left;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .parsed-course {
+      padding: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    .dark-mode .parsed-course {
+      border-bottom: 1px solid #444;
+    }
+    .process-button {
+      padding: 0.8rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
 
     /* ---------------- Mobile Friendly Adjustments ---------------- */
     @media (max-width: 600px) {
@@ -300,36 +356,14 @@
         flex-direction: column;
         gap: 0.5rem;
       }
+      .upload-area {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
 <body>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-5HL4F5ZJGK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-5HL4F5ZJGK');
-</script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OUSL GPA Calculator</title>
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-  <!-- XLSX Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
-  <!-- Canvas Confetti Library -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <style>
-    /* ... existing CSS styles ... */
-  </style>
-</head>
-<body>
+ 
   <!-- Updated datalist with all courses -->
   <datalist id="courseList">
     <!-- Level 3 Courses -->
@@ -562,16 +596,6 @@
     <option value="PEU6611" data-credits="6">Research project in Mathematics</option>
   </datalist>
 
-  <!-- ... rest of the HTML remains unchanged ... -->
-
-  <script>
-    // ... existing JavaScript code remains unchanged ...
-  </script>
-  <a href="https://abishekrkumar.github.io/OUSL-FE-Target-Calc/" class="fab" title="FE Target Calculator">
-    <i class="fas fa-bullseye"></i>
-  </a>
-</body>
-</html>
   <!-- Fixed Top Bar (remains outside the container) -->
   <div class="top-bar">
     <select id="languageSelect">
@@ -612,6 +636,20 @@
           <i class="fas fa-share-alt"></i> <span data-translate="shareResults">Share Results</span>
         </button>
       </div>
+    </div>
+
+    <!-- Marksheet Upload Section -->
+    <div class="upload-section">
+      <h2 data-translate="uploadHeader">Upload Official Marksheet</h2>
+      <p data-translate="uploadDescription">Drop your official OUSL marksheet from MyOUSL here or click to browse</p>
+      
+      <div class="upload-area" id="dropArea">
+        <i class="fas fa-file-upload"></i>
+        <p data-translate="uploadAction">Select or drop .xls file</p>
+        <input type="file" id="fileInput" accept=".xls,.xlsx">
+      </div>
+      
+      <div id="parseResults"></div>
     </div>
 
     <div class="developer-info">
@@ -661,7 +699,15 @@
         disclaimer: "Note: When you click the Share Results button, an Excel file containing your course details and calculated GPA will be downloaded. Later, you can use the Load Existing Data option to upload this file allows you to retrieve your previous records, add new courses, and recalculate your updated GPA. This tool is independent and not affiliated with The Open University of Sri Lanka. Please verify results with official university sources.",
         loadData: "Load Existing Data",
         darkMode: "Dark Mode",
-        lightMode: "Light Mode"
+        lightMode: "Light Mode",
+        uploadHeader: "Upload MYOUSL Marksheet",
+        uploadDescription: "Drop your official OUSL marksheet file from MyOUSL or click to browse",
+        uploadAction: "Select or drop .xls file",
+        coursesFound: "Courses found:",
+        addToCalculator: "Add to Calculator",
+        credits: "Credits",
+        grade: "Grade",
+        coursesAdded: "courses added to calculator"
       },
       ta: {
         addCourse: "பாடம் சேர்க்கவும்",
@@ -674,7 +720,15 @@
         disclaimer: "குறிப்பு: 'முடிவுகளை பகிரவும்' பொத்தானை அழுத்தும் போது, உங்கள் பாடப் தகவல்களும் கணிக்கப்பட்ட GPA-வும் கொண்ட Excel கோப்பு பதிவிறக்கம் செய்யப்படும். பின்னர், 'கூட இருப்புத் தரவை ஏற்று' என்பதன் மூலம் இந்த கோப்பை மீண்டும் ஏற்று, உங்கள் முந்தைய பதிவுகளை பெறலாம்; புதிய பாடங்களைச் சேர்த்து, இப்போது புதுப்பிக்கப்பட்ட GPA-ஐ மீண்டும் கணக்கிடலாம். இந்த கருவி OUSL-க்கு சார்ந்தது அல்ல. அதிகாரப்பூர்வ பல்கலைக்கழக தகவல்களுடன் முடிவுகளை சரிபார்க்கவும்.",
         loadData: "கூட இருப்புத் தரவை ஏற்று",
         darkMode: "இருண்ட முறை",
-        lightMode: "வெளிச்சம் முறை"
+        lightMode: "வெளிச்சம் முறை",
+        uploadHeader: "அதிகாரப்பூர்வ மதிப்பெண் பட்டியலை பதிவேற்று",
+        uploadDescription: "உங்கள் அதிகாரப்பூர்வ OUSL மதிப்பெண் பட்டியல் கோப்பை இங்கே விடவும் அல்லது உலாவ கிளிக் செய்யவும்",
+        uploadAction: ".xls கோப்பைத் தேர்ந்தெடு அல்லது இழு",
+        coursesFound: "பாடங்கள் கண்டறியப்பட்டது:",
+        addToCalculator: "கால்குலேட்டரில் சேர்",
+        credits: "கடன் புள்ளிகள்",
+        grade: "தரம்",
+        coursesAdded: "பாடங்கள் கால்குலேட்டரில் சேர்க்கப்பட்டது"
       },
       si: {
         addCourse: "පාඨමාලා එකතු කරන්න",
@@ -687,7 +741,15 @@
         disclaimer: "සටහන්: 'ප්‍රතිඵල බෙදාගන්න' බොත්තම ඔබන විට, ඔබගේ පාඨමාලා විස්තර සහ ගණනය කරන ලද GPA අඩංගු Excel ගොනුවක් බාගත වේ. පසුව, 'දැනට පවතින දත්ත උඩුගත කරන්න' විකල්පය භාවිතා කර මෙම ගොනුව උඩුගත කර ඔබගේ පසුගිය තොරතුරු ප්‍රාප්ත කර, නව පාඨමාලා එක් කර, යාවත්කාලීන GPA ගණනය කළ හැකිය. මෙම මෙවලම OUSL-ට අයත් නොවන අතර, කරුණාකර නිල විශ්වවිද්‍යාල සම්පත් සමඟ ප්‍රතිඵල සනාථ කරන්න.",
         loadData: "දැනට පවතින දත්ත උඩුගත කරන්න",
         darkMode: "අඳුරු මාදිලිය",
-        lightMode: "පැහැදිලි මාදිලිය"
+        lightMode: "පැහැදිලි මාදිලිය",
+        uploadHeader: "නිල ලකුණු පත්‍රය උඩුගත කරන්න",
+        uploadDescription: "ඔබගේ නිල OUSL ලකුණු පත්‍ර ගොනුව මෙහි අතහැර දමන්න හෝ පිරික්සීමට ක්ලික් කරන්න",
+        uploadAction: ".xls ගොනුව තෝරන්න හෝ ඇද දමන්න",
+        coursesFound: "පාඨමාලා හමුවිය:",
+        addToCalculator: "ගණකයට එක් කරන්න",
+        credits: "කෙටි",
+        grade: "ශ්‍රේණිය",
+        coursesAdded: "පාඨමාලා ගණක යන්ත්‍රයට එකතු කරන ලදි"
       }
     };
 
@@ -939,6 +1001,216 @@
       };
       reader.readAsBinaryString(file);
     });
+    
+    // --------- Marksheet Upload Feature ---------
+    // Courses to skip (as per requirement)
+    const SKIP_COURSES = ['CYE3200', 'CSE3214', 'FDE3021', 'FNE3000', 'LTE3406'];
+
+    // Upload functionality
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('fileInput');
+    const parseResults = document.getElementById('parseResults');
+
+    dropArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+      dropArea.style.backgroundColor = 'rgba(67, 97, 238, 0.2)';
+    }
+
+    function unhighlight() {
+      dropArea.style.backgroundColor = '';
+    }
+
+    dropArea.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length) {
+        fileInput.files = files;
+        handleFiles(files);
+      }
+    }
+
+    fileInput.addEventListener('change', function() {
+      handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+      const file = files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, {type: 'array'});
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          
+          // Convert to JSON
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+          
+          // Process the marksheet data
+          const courses = processMarksheet(jsonData);
+          displayParsedCourses(courses);
+        } catch (error) {
+          parseResults.innerHTML = `<p style="color: red;">${translations[currentLang].errorProcessing}: ${error.message}</p>`;
+        }
+      };
+      
+      reader.readAsArrayBuffer(file);
+    }
+
+    function processMarksheet(data) {
+      const courses = [];
+      
+      // Find the row with headers
+      let headerRowIndex = -1;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].some(cell => typeof cell === 'string' && cell.includes('Course Code'))) {
+          headerRowIndex = i;
+          break;
+        }
+      }
+      
+      if (headerRowIndex === -1) {
+        throw new Error('Could not find header row in the marksheet');
+      }
+      
+      // Map headers to indexes
+      const headers = data[headerRowIndex];
+      const codeIndex = headers.findIndex(h => h.includes('Course Code'));
+      const nameIndex = headers.findIndex(h => h.includes('Course Name'));
+      const statusIndex = headers.findIndex(h => h.includes('Progress Status'));
+      const gradeIndex = headers.findIndex(h => h.includes('Grade'));
+      
+      if (codeIndex === -1 || nameIndex === -1 || statusIndex === -1 || gradeIndex === -1) {
+        throw new Error('Required columns not found in the marksheet');
+      }
+      
+      // Process each row after the header
+      for (let i = headerRowIndex + 1; i < data.length; i++) {
+        const row = data[i];
+        if (!row[codeIndex]) continue;
+        
+        const courseCode = String(row[codeIndex]).trim();
+        const courseName = row[nameIndex] ? String(row[nameIndex]).trim() : '';
+        const progressStatus = row[statusIndex] ? String(row[statusIndex]).trim() : '';
+        const grade = row[gradeIndex] ? String(row[gradeIndex]).trim() : '';
+        
+        // Skip courses that should be disregarded
+        if (SKIP_COURSES.includes(courseCode)) continue;
+        
+        // Skip non-passing grades (only include "Pass" status)
+        if (progressStatus !== 'Pass') continue;
+        
+        // Get credits from course code (5th character)
+        const credits = courseCode.length >= 5 ? parseInt(courseCode[4]) : 0;
+        
+        if (credits > 0 && grade) {
+          courses.push({
+            code: courseCode,
+            name: courseName,
+            credits: credits,
+            grade: grade
+          });
+        }
+      }
+      
+      return courses;
+    }
+
+    function displayParsedCourses(courses) {
+      if (courses.length === 0) {
+        parseResults.innerHTML = `<p>${translations[currentLang].coursesFound} 0</p>`;
+        return;
+      }
+      
+      let html = `
+        <p><strong>${translations[currentLang].coursesFound}</strong> ${courses.length}</p>
+        <div class="courses-list">
+      `;
+      
+      courses.forEach(course => {
+        html += `
+          <div class="parsed-course">
+            <strong>${course.code}</strong>: ${course.name} 
+            (${translations[currentLang].credits}: ${course.credits}, 
+            ${translations[currentLang].grade}: ${course.grade})
+          </div>
+        `;
+      });
+      
+      html += `
+        </div>
+        <button id="addCoursesButton" class="process-button">
+          <i class="fas fa-calculator"></i> ${translations[currentLang].addToCalculator}
+        </button>
+      `;
+      
+      parseResults.innerHTML = html;
+      
+      document.getElementById('addCoursesButton').addEventListener('click', () => {
+        addCoursesToCalculator(courses);
+      });
+    }
+
+    function addCoursesToCalculator(courses) {
+      // Clear existing courses
+      coursesContainer.innerHTML = '';
+      
+      // Add new courses from marksheet
+      courses.forEach(course => {
+        const newCourse = createCourseElement();
+        const inputs = newCourse.querySelectorAll('input, select');
+        
+        // Set course code/name
+        inputs[0].value = course.code;
+        
+        // Set credits
+        inputs[1].value = course.credits;
+        
+        // Set grade
+        const gradeSelect = inputs[2];
+        for (let i = 0; i < gradeSelect.options.length; i++) {
+          if (gradeSelect.options[i].text === course.grade) {
+            gradeSelect.selectedIndex = i;
+            break;
+          }
+        }
+        
+        coursesContainer.appendChild(newCourse);
+      });
+      
+      // Add event listeners and enable calculate button
+      addCourseEventListeners();
+      saveCourses();
+      document.getElementById('calculateButton').disabled = courses.length === 0;
+      
+      // Show success message
+      parseResults.innerHTML = `<p style="color: green;">${courses.length} ${translations[currentLang].coursesAdded}</p>`;
+    }
   </script>
   <a href="https://abishekrkumar.github.io/OUSL-FE-Target-Calc/" class="fab" title="FE Target Calculator">
     <i class="fas fa-bullseye"></i>

@@ -625,7 +625,7 @@
       </div>
     </form>
 
-    <div id="result">
+    <div id="result" class="result-section">
       <h2 data-translate="academicSummary">Your Academic Summary</h2>
       <div class="gpa-display"><span id="gpaValue">0.00</span></div>
       <p id="gpaClass" class="gpa-class"></p>
@@ -859,67 +859,7 @@
     // --------- GPA Calculation ---------
     document.getElementById('gpaForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const courses = document.getElementsByClassName('course');
-      let totalCredits = 0;
-      let totalPoints = 0;
-      const courseData = [];
-
-      Array.from(courses).forEach(course => {
-        const inputs = course.querySelectorAll('input, select');
-        const courseName = inputs[0].value;
-        const credits = parseFloat(inputs[1].value);
-        const gradeValue = parseFloat(inputs[2].value);
-        const gradeText = inputs[2].options[inputs[2].selectedIndex].text;
-        
-        if (!isNaN(credits) && !isNaN(gradeValue)) {
-          totalCredits += credits;
-          totalPoints += credits * gradeValue;
-          courseData.push({
-            Course: courseName,
-            Credits: credits,
-            Grade: gradeText
-          });
-        }
-      });
-
-      const gpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
-      document.getElementById('gpaValue').textContent = gpa.toFixed(2);
-      document.getElementById('result').style.display = 'block';
-      
-      const gpaClass = document.getElementById('gpaClass');
-      if (gpa >= 3.7) gpaClass.textContent = 'First Class Honors';
-      else if (gpa >= 3.3) gpaClass.textContent = 'Second Class Upper Division';
-      else if (gpa >= 3.0) gpaClass.textContent = 'Second Class Lower Division';
-      else gpaClass.textContent = 'General Pass';
-      
-      // Trigger confetti if GPA is greater than 3.0
-      if (gpa > 3.0) {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      }
-
-      // Set a motivational message
-      const highGpaMessages = [
-        "Great job! Your hard work is paying off!",
-        "Amazing performance! Keep shining!",
-        "Fantastic work! Your dedication shows!",
-        "Excellent! You're on the right track!"
-      ];
-      const lowGpaMessages = [
-        "Don't worry, every challenge is a stepping stone!",
-        "Keep pushing, your best is yet to come!",
-        "Stay motivated, you can achieve more!",
-        "Every setback is a setup for a comeback!"
-      ];
-      const msgArray = gpa < 3.0 ? lowGpaMessages : highGpaMessages;
-      const randomMsg = msgArray[Math.floor(Math.random() * msgArray.length)];
-      document.getElementById('motivationalMessage').textContent = randomMsg;
-      
-      localStorage.setItem('courseData', JSON.stringify(courseData));
-      saveCourses();
+      calculateGPA();
     });
 
     // --------- Generate Excel for Sharing ---------
@@ -1061,7 +1001,7 @@
       
       const reader = new FileReader();
       
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const data = new Uint8Array(e.target.result);
           const workbook = XLSX.read(data, {type: 'array'});
@@ -1073,7 +1013,13 @@
           
           // Process the marksheet data
           const courses = processMarksheet(jsonData);
-          displayParsedCourses(courses);
+          await addCoursesToCalculator(courses);
+          calculateGPA();
+          
+          // Scroll to results section
+          document.querySelector('.result-section').scrollIntoView({
+            behavior: 'smooth'
+          });
         } catch (error) {
           parseResults.innerHTML = `<p style="color: red;">${translations[currentLang].errorProcessing}: ${error.message}</p>`;
         }
@@ -1171,45 +1117,119 @@
       
       parseResults.innerHTML = html;
       
-      document.getElementById('addCoursesButton').addEventListener('click', () => {
-        addCoursesToCalculator(courses);
+      document.getElementById('addCoursesButton').addEventListener('click', async () => {
+        await addCoursesToCalculator(courses);
+        calculateGPA();
       });
     }
 
-    function addCoursesToCalculator(courses) {
-      // Clear existing courses
-      coursesContainer.innerHTML = '';
-      
-      // Add new courses from marksheet
-      courses.forEach(course => {
-        const newCourse = createCourseElement();
-        const inputs = newCourse.querySelectorAll('input, select');
+    function calculateGPA() {
+      const courses = document.getElementsByClassName('course');
+      let totalCredits = 0;
+      let totalPoints = 0;
+      const courseData = [];
+
+      Array.from(courses).forEach(course => {
+        const inputs = course.querySelectorAll('input, select');
+        const courseName = inputs[0].value;
+        const credits = parseFloat(inputs[1].value);
+        const gradeValue = parseFloat(inputs[2].value);
+        const gradeText = inputs[2].options[inputs[2].selectedIndex].text;
         
-        // Set course code/name
-        inputs[0].value = course.code;
-        
-        // Set credits
-        inputs[1].value = course.credits;
-        
-        // Set grade
-        const gradeSelect = inputs[2];
-        for (let i = 0; i < gradeSelect.options.length; i++) {
-          if (gradeSelect.options[i].text === course.grade) {
-            gradeSelect.selectedIndex = i;
-            break;
-          }
+        if (!isNaN(credits) && !isNaN(gradeValue)) {
+          totalCredits += credits;
+          totalPoints += credits * gradeValue;
+          courseData.push({
+            Course: courseName,
+            Credits: credits,
+            Grade: gradeText
+          });
         }
-        
-        coursesContainer.appendChild(newCourse);
+      });
+
+      const gpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
+      document.getElementById('gpaValue').textContent = gpa.toFixed(2);
+      document.getElementById('result').style.display = 'block';
+      
+      // Scroll to results section
+      document.getElementById('result').scrollIntoView({
+        behavior: 'smooth'
       });
       
-      // Add event listeners and enable calculate button
-      addCourseEventListeners();
-      saveCourses();
-      document.getElementById('calculateButton').disabled = courses.length === 0;
+      const gpaClass = document.getElementById('gpaClass');
+      if (gpa >= 3.7) gpaClass.textContent = 'First Class Honors';
+      else if (gpa >= 3.3) gpaClass.textContent = 'Second Class Upper Division';
+      else if (gpa >= 3.0) gpaClass.textContent = 'Second Class Lower Division';
+      else gpaClass.textContent = 'General Pass';
       
-      // Show success message
-      parseResults.innerHTML = `<p style="color: green;">${courses.length} ${translations[currentLang].coursesAdded}</p>`;
+      // Trigger confetti if GPA is greater than 3.0
+      if (gpa > 3.0) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+
+      // Set a motivational message
+      const highGpaMessages = [
+        "Great job! Your hard work is paying off!",
+        "Amazing performance! Keep shining!",
+        "Fantastic work! Your dedication shows!",
+        "Excellent! You're on the right track!"
+      ];
+      const lowGpaMessages = [
+        "Don't worry, every challenge is a stepping stone!",
+        "Keep pushing, your best is yet to come!",
+        "Stay motivated, you can achieve more!",
+        "Every setback is a setup for a comeback!"
+      ];
+      const msgArray = gpa < 3.0 ? lowGpaMessages : highGpaMessages;
+      const randomMsg = msgArray[Math.floor(Math.random() * msgArray.length)];
+      document.getElementById('motivationalMessage').textContent = randomMsg;
+      
+      localStorage.setItem('courseData', JSON.stringify(courseData));
+      saveCourses();
+    }
+
+    function addCoursesToCalculator(courses) {
+      return new Promise((resolve) => {
+        // Clear existing courses
+        coursesContainer.innerHTML = '';
+        
+        // Add new courses from marksheet
+        courses.forEach(course => {
+          const newCourse = createCourseElement();
+          const inputs = newCourse.querySelectorAll('input, select');
+          
+          // Set course code/name
+          inputs[0].value = course.code;
+          
+          // Set credits
+          inputs[1].value = course.credits;
+          
+          // Set grade
+          const gradeSelect = inputs[2];
+          for (let i = 0; i < gradeSelect.options.length; i++) {
+            if (gradeSelect.options[i].text === course.grade) {
+              gradeSelect.selectedIndex = i;
+              break;
+            }
+          }
+          
+          coursesContainer.appendChild(newCourse);
+        });
+        
+        // Add event listeners and enable calculate button
+        addCourseEventListeners();
+        saveCourses();
+        document.getElementById('calculateButton').disabled = courses.length === 0;
+        
+        // Show success message
+        parseResults.innerHTML = `<p style="color: green;">${courses.length} ${translations[currentLang].coursesAdded}</p>`;
+        
+        resolve();
+      });
     }
   </script>
   <a href="https://abishekrkumar.github.io/OUSL-FE-Target-Calc/" class="fab" title="FE Target Calculator">

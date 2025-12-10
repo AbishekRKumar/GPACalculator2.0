@@ -1292,5 +1292,48 @@ button:hover {
   <a href="https://abishekrkumar.github.io/OUSL-FE-Target-Calc/" class="fab" title="FE Target Calculator">
     <i class="fas fa-bullseye"></i>
   </a>
+  <style>
+  .snowflake {
+    position: fixed;
+    top: -10px;
+    z-index: 9999;
+    user-select: none;
+    pointer-events: none;
+    color: white; /* Change this to #000 if your background is white */
+    font-size: 1.5em;
+    animation-name: fall;
+    animation-timing-function: linear;
+  }
+  
+  @keyframes fall {
+    to { transform: translateY(105vh); }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const createSnowflake = () => {
+      const snowflake = document.createElement('div');
+      snowflake.innerHTML = '❄'; // You can change this to '*' or '•'
+      snowflake.classList.add('snowflake');
+      
+      // Randomize position, size, and animation speed
+      snowflake.style.left = Math.random() * 100 + 'vw';
+      snowflake.style.animationDuration = Math.random() * 3 + 2 + 's'; // 2-5 seconds
+      snowflake.style.opacity = Math.random();
+      snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+      
+      document.body.appendChild(snowflake);
+      
+      // Remove snowflake after it falls to keep page light
+      setTimeout(() => {
+        snowflake.remove();
+      }, 5000);
+    };
+
+    // Create a new snowflake every 100 milliseconds
+    setInterval(createSnowflake, 100);
+  });
+</script>
 </body>
 </html>
